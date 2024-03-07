@@ -2,27 +2,7 @@
 #include <string>
 
 #include "bsptree.h"
-
-//////////////// random
-
-/*
- Get a random double between 0 and 1.
- */
-double randomDouble() {
-	return ((double)std::rand() / (double)RAND_MAX);
-}
-
-/*
- Get a random integer.
- @param from: From this value (inclusive).
- @param to: To this value (exclusive).
- */
-int randomInt(int from, int to) {
-	if (to <= from) { return from; }
-
-	int range = to - from;
-	return from + (rand() % range);
-}
+#include "random.h"
 
 //////////////// generation
 
@@ -33,124 +13,136 @@ void BSPTree::generate(Dungeon* dungeon) {
 	std::shared_ptr<Point> start = std::make_shared<Point>(0, 0);
 	std::shared_ptr<Point> end = std::make_shared<Point>(width, length);
 	Node root = Node(start, end);
-	root.generate();
-
-	root.setTiles(dungeon);
+	generate(root);
+	std::cout << "set tiles \n";
+	setTiles(dungeon, root);
 }
 
-void Node::generate() {
+void BSPTree::generate(Node& node) {
+	std::cout << "at address " << &node << "\n";
+	std::cout << "at " << (*node.getStartPoint()).toString() << ", " << (*node.getEndPoint()).toString() << "\n";
+
 	double orient = randomDouble();
 
 	if (orient >= 0.5) {
 		// is there enough space to split in the randomly chosen orientation
-		if (hasEnoughSpaceToSplit(startCorner->getX(), endCorner->getX(), minRoomWidth)) {
-			generateHorizontalSplit();
+		if (hasEnoughSpaceToSplit(node.getStartPoint()->getX(), node.getEndPoint()->getX(), minRoomWidth)) {
+			generateSplit(false, node);
 		}
 		// is there enough space to split in the other orientation
-		else if (hasEnoughSpaceToSplit(startCorner->getY(), endCorner->getY(), minRoomLength, 6)) {
-			generateVerticalSplit();
+		else if (hasEnoughSpaceToSplit(node.getStartPoint()->getY(), node.getEndPoint()->getY(), minRoomLength, 6)) {
+			generateSplit(true, node);
 		}
 		// this is a leaf node so generate a room
 		else {
-			generateRoom();
+			generateRoom(node);
 		}
 	}
 	else {
 		// is there enough space to split in the randomly chosen orientation
-		if (hasEnoughSpaceToSplit(startCorner->getY(), endCorner->getY(), minRoomLength)) {
-			generateVerticalSplit();
+		if (hasEnoughSpaceToSplit(node.getStartPoint()->getY(), node.getEndPoint()->getY(), minRoomLength)) {
+			generateSplit(true, node);
 		}
 		// is there enough space to split in the other orientation
-		else if (hasEnoughSpaceToSplit(startCorner->getX(), endCorner->getX(), minRoomWidth, 6)) {
-			generateHorizontalSplit();
+		else if (hasEnoughSpaceToSplit(node.getStartPoint()->getX(), node.getEndPoint()->getX(), minRoomWidth), 6) {
+			generateSplit(false, node);
 		}
 		// this is a leaf node so generate a room
 		else {
-			generateRoom();
+			generateRoom(node);
 		}
 	}
 }
 
-void Node::generateHorizontalSplit() {
-	vertical = false;
+void BSPTree::generateSplit(bool isVertical, Node& node) {
+	Node* child1 = NULL;
+	Node* child2 = NULL;
 
-	// create a horizontal split
-	int splitAt = randomInt(startCorner->getX() + minRoomWidth + 1, endCorner->getX() - minRoomWidth - 1);
+	// create children based on given split (vertical or horizontal)
+	if (isVertical) {
+		int splitAt = randomInt(node.getStartPoint()->getY() + minRoomWidth + 1, node.getEndPoint()->getY() - minRoomWidth - 1);
 
-	// create two children
-	std::shared_ptr<Point> splitStartPoint = std::make_shared<Point>(splitAt, startCorner->getY());
-	std::shared_ptr<Point> splitEndPoint = std::make_shared<Point>(splitAt, endCorner->getY());
-	this->child1 = new Node(startCorner, splitEndPoint);
-	this->child2 = new Node(splitStartPoint, endCorner);
+		std::shared_ptr<Point> splitStartPoint = std::make_shared<Point>(node.getStartPoint()->getX(), splitAt);
+		std::shared_ptr<Point> splitEndPoint = std::make_shared<Point>(node.getEndPoint()->getX(), splitAt);
+		child1 = new Node(node.getStartPoint(), splitEndPoint);
+		child2 = new Node(splitStartPoint, node.getEndPoint());
+	}
+	else {
+		int splitAt = randomInt(node.getStartPoint()->getX() + minRoomWidth + 1, node.getEndPoint()->getX() - minRoomWidth - 1);
+
+		std::shared_ptr<Point> splitStartPoint = std::make_shared<Point>(splitAt, node.getStartPoint()->getY());
+		std::shared_ptr<Point> splitEndPoint = std::make_shared<Point>(splitAt, node.getEndPoint()->getY());
+		child1 = new Node(node.getStartPoint(), splitEndPoint);
+		child2 = new Node(splitStartPoint, node.getEndPoint());
+	}
+
+	// set node children
+	node.setChildren(isVertical, child1, child2);
+
+	std::cout << "child1 addresses " << child1->getStartPoint() << ", " << child1->getEndPoint() << "\n";
+	std::cout << "child2 addresses " << child2->getStartPoint() << ", " << child2->getEndPoint() << "\n";
+	std::cout << "child1 " << child1->getStartPoint()->toString() << ", " << child1->getEndPoint()->toString() << "\n";
+	std::cout << "child2 " << child2->getStartPoint()->toString() << ", " << child2->getEndPoint()->toString() << "\n";
 
 	// recurse with children
-	child1->generate();
-	child2->generate();
+	generate(*node.getFirstChild());
+	generate(*node.getSecondChild());
 }
 
-void Node::generateVerticalSplit() {
-	vertical = true;
-
-	// create a horizontal split
-	int splitAt = randomInt(startCorner->getY() + minRoomWidth + 1, endCorner->getY() - minRoomWidth - 1);
-
-	// create two children
-	std::shared_ptr<Point> splitStartPoint = std::make_shared<Point>(startCorner->getX(), splitAt);
-	std::shared_ptr<Point> splitEndPoint = std::make_shared<Point>(endCorner->getX(), splitAt);
-	this->child1 = new Node(startCorner, splitEndPoint);
-	this->child2 = new Node(splitStartPoint, endCorner);
-
-	// recurse with children
-	child1->generate();
-	child2->generate();
-}
-
-void Node::generateRoom() {
+void BSPTree::generateRoom(Node& node) {
 	Point* start = new Point(
-		randomInt(startCorner->getX() + 1, endCorner->getX() - minRoomWidth + 1),
-		randomInt(startCorner->getY() + 1, endCorner->getY() - minRoomLength + 1)
+		randomInt(node.getStartPoint()->getX() + 1, node.getEndPoint()->getX() - minRoomWidth + 1),
+		randomInt(node.getStartPoint()->getY() + 1, node.getEndPoint()->getY() - minRoomLength + 1)
 	);
 
 	Point* end = new Point(
-		randomInt(start->getX() + minRoomWidth, endCorner->getX() + 1),
-		randomInt(start->getY() + minRoomLength, endCorner->getY() + 1)
+		randomInt(start->getX() + minRoomWidth, node.getEndPoint()->getX() + 1),
+		randomInt(start->getY() + minRoomLength, node.getEndPoint()->getY() + 1)
 	);
 
-	this->room = new Room(start, end);
+	// set node as leaf
+	Room* room = new Room(start, end);
+	node.setLeaf(room);
 }
 
 //////////////// helper generation functions
 
-bool Node::hasEnoughSpaceToSplit(int lb, int ub, int minRoomLength, int extra) {
+bool BSPTree::hasEnoughSpaceToSplit(int lb, int ub, int minRoomLength, int extra) {
 	return (ub - lb) >= minRoomLength * 2 + 2 + extra;
 }
 
 //////////////// set tiles
 
-void Node::setTiles(Dungeon* dungeon) {
-	setFloorTiles(dungeon);
-	setWallTiles(dungeon);
+void BSPTree::setTiles(Dungeon* dungeon, Node& node) {
+	std::cout << "at address " << &node;
+	std::cout << "at " << (*node.getStartPoint()).toString() << ", " << (*node.getEndPoint()).toString() << "\n";
+
+	std::cout << (*node.getStartPoint()).toString() << "\n";
+	std::cout << (*node.getEndPoint()).toString() << "\n";
+
+	setFloorTiles(dungeon, node);
+	setWallTiles(dungeon, node);
 }
 
-void Node::setFloorTiles(Dungeon* dungeon) {
+void BSPTree::setFloorTiles(Dungeon* dungeon, Node& node) {
 	// set floor tiles for room if this node has a room
-	if (room) {
-		room->setTiles(dungeon);
+	if (node.getRoom()) {
+		setTiles(dungeon, *node.getRoom());
 	}
 
 	// recurse with children
-	if (child1) {
-		child1->setFloorTiles(dungeon);
+	if (node.getFirstChild()) {
+		setFloorTiles(dungeon, *node.getFirstChild());
 	}
 
-	if (child2) {
-		child2->setFloorTiles(dungeon);
+	if (node.getSecondChild()) {
+		setFloorTiles(dungeon, *node.getSecondChild());
 	}
 }
 
-void Node::setWallTiles(Dungeon* dungeon) {
-	for (int y = startCorner->getY(); y < endCorner->getY(); y++) {
-		for (int x = startCorner->getX(); x < endCorner->getX(); x++) {
+void BSPTree::setWallTiles(Dungeon* dungeon, Node& node) {
+	for (int y = node.getStartPoint()->getY(); y < node.getEndPoint()->getY(); y++) {
+		for (int x = node.getStartPoint()->getX(); x < node.getEndPoint()->getX(); x++) {
 			if (dungeon->getTile(x, y) == floorTile) {
 				// set surrounding void tiles to walls (going clockwise)
 				if (dungeon->getTile(x - 1, y - 1) == voidTile) {
@@ -182,28 +174,10 @@ void Node::setWallTiles(Dungeon* dungeon) {
 	}
 }
 
-void Room::setTiles(Dungeon* dungeon) {
-	for (int y = startCorner->getY(); y < endCorner->getY(); y++) {
-		for (int x = startCorner->getX(); x < endCorner->getX(); x++) {
+void BSPTree::setTiles(Dungeon* dungeon, Room room) {
+	for (int y = room.getStartPoint().getY(); y < room.getEndPoint().getY(); y++) {
+		for (int x = room.getStartPoint().getX(); x < room.getEndPoint().getX(); x++) {
 			dungeon->setTile(floorTile, x, y);
 		}
 	}
-}
-
-//////////////// to string
-
-std::string Node::toString() {
-	std::ostringstream oss;
-	oss << "Node (" << startCorner->toString() << " to " << endCorner->toString() << ") \n";
-	std::string str = oss.str();
-
-	return str;
-}
-
-std::string Room::toString() {
-	std::ostringstream oss;
-	oss << "Room (" << startCorner->toString() << " to " << endCorner->toString() << ") \n";
-	std::string str = oss.str();
-
-	return str;
 }
