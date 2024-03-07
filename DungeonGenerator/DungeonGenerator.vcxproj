@@ -150,6 +150,7 @@
     <ClCompile Include="dungeonGenerator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="point.cpp" />
+    <ClCompile Include="random.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bsptree.h" />
@@ -157,6 +158,7 @@
     <ClInclude Include="dungeonGenerator.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="point.h" />
+    <ClInclude Include="random.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

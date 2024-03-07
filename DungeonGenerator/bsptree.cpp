@@ -2,27 +2,7 @@
 #include <string>
 
 #include "bsptree.h"
-
-//////////////// random
-
-/*
- Get a random double between 0 and 1.
- */
-double randomDouble() {
-	return ((double)std::rand() / (double)RAND_MAX);
-}
-
-/*
- Get a random integer.
- @param from: From this value (inclusive).
- @param to: To this value (exclusive).
- */
-int randomInt(int from, int to) {
-	if (to <= from) { return from; }
-
-	int range = to - from;
-	return from + (rand() % range);
-}
+#include "random.h"
 
 //////////////// generation
 
