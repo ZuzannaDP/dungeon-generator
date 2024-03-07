@@ -17,7 +17,7 @@ int main(int argc, char* args[]) {
 	cin >> length;
 
 	Dungeon dungeon = Dungeon(width, length);
-	cout << dungeon.getWidth();
+	dungeon.print();
 
 	return 0;
 }
