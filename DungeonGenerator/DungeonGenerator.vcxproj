@@ -145,12 +145,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="bsptree.cpp" />
     <ClCompile Include="dungeon.cpp" />
+    <ClCompile Include="dungeonGenerator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="point.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bsptree.h" />
     <ClInclude Include="dungeon.h" />
+    <ClInclude Include="dungeonGenerator.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="point.h" />
   </ItemGroup>

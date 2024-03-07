@@ -1,3 +1,6 @@
+#include <sstream>
+#include <string>
+
 #include "point.h"
 
 // getters and setters
@@ -14,4 +17,12 @@ void Point::add(Point point) {
 void Point::subtract(Point point) {
 	x -= point.getX();
 	y -= point.getY();
+}
+
+std::string Point::toString() {
+	std::ostringstream oss;
+	oss << "Point(" << x << ", " << y << ")";
+	std::string str = oss.str();
+
+	return str;
 }

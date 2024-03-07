@@ -1,6 +1,8 @@
 #ifndef POINT_H
 #define POINT_H
 
+#include <string>
+
 class Point
 {
 private:
@@ -19,16 +21,21 @@ public:
 	void setY(int y);
 
 	/*
-	 * In place addition.
-	 * @param point The point to add.
+	 In place addition.
+	 @param point: The point to add.
 	 */
 	void add(Point point);
 
 	/*
-	 * In place subtraction.
-	 * @param point The point to subtract.
+	 In place subtraction.
+	 @param point: The point to subtract.
 	 */
 	void subtract(Point point);
+
+	/*
+	 Get string representation of the point.
+	 */
+	std::string toString();
 };
 
 #endif

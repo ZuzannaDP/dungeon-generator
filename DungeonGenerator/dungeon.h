@@ -9,11 +9,13 @@ const char voidTile = ' ';
 const char wallTile = '#';
 const char floorTile = '.';
 
-struct Tile {
+struct Tile 
+{
 	char type;
 };
 
-class Dungeon {
+class Dungeon 
+{
 private:
 	char* grid;
 	int width;
