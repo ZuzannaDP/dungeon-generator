@@ -44,7 +44,7 @@ void BSPTree::generate(Node& node) {
 			generateSplit(true, node);
 		}
 		// is there enough space to split in the other orientation
-		else if (hasEnoughSpaceToSplit(node.getStartPoint()->getX(), node.getEndPoint()->getX(), minRoomWidth), 6) {
+		else if (hasEnoughSpaceToSplit(node.getStartPoint()->getX(), node.getEndPoint()->getX(), minRoomWidth, 6)) {
 			generateSplit(false, node);
 		}
 		// this is a leaf node so generate a room
