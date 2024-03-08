@@ -14,14 +14,10 @@ void BSPTree::generate(Dungeon* dungeon) {
 	std::shared_ptr<Point> end = std::make_shared<Point>(width, length);
 	Node root = Node(start, end);
 	generate(root);
-	std::cout << "set tiles \n";
 	setTiles(dungeon, root);
 }
 
 void BSPTree::generate(Node& node) {
-	std::cout << "at address " << &node << "\n";
-	std::cout << "at " << (*node.getStartPoint()).toString() << ", " << (*node.getEndPoint()).toString() << "\n";
-
 	double orient = randomDouble();
 
 	if (orient >= 0.5) {
@@ -123,13 +119,8 @@ bool BSPTree::hasEnoughSpace(int lb, int ub, int numRooms, int minRoomLength, in
 //////////////// set tiles
 
 void BSPTree::setTiles(Dungeon* dungeon, Node& node) {
-	std::cout << "at address " << &node;
-	std::cout << "at " << (*node.getStartPoint()).toString() << ", " << (*node.getEndPoint()).toString() << "\n";
-
-	std::cout << (*node.getStartPoint()).toString() << "\n";
-	std::cout << (*node.getEndPoint()).toString() << "\n";
-
 	setFloorTiles(dungeon, node);
+	setCorridorTiles(dungeon, node);
 	setWallTiles(dungeon, node);
 }
 
@@ -147,6 +138,71 @@ void BSPTree::setFloorTiles(Dungeon* dungeon, Node& node) {
 	if (node.getSecondChild()) {
 		setFloorTiles(dungeon, *node.getSecondChild());
 	}
+}
+
+void BSPTree::setCorridorTiles(Dungeon* dungeon, Node& node) {
+	// exit if reached leaf
+	if (!node.getFirstChild() && !node.getSecondChild()) {
+		return;
+	}
+
+	// connect every pair of children (ensures full connectivity between rooms)
+	Room& firstRoom = node.getFirstChild()->getAnyRoom();
+	Room& secondRoom = node.getSecondChild()->getAnyRoom();
+
+	// get middle point from both rooms
+	Point firstMiddlePoint = Point(0, 0);
+	firstRoom.getMiddlePoint(firstMiddlePoint);
+	Point secondMiddlePoint = Point(0, 0);
+	secondRoom.getMiddlePoint(secondMiddlePoint);
+
+	// create L shaped corridor by creating corridor bend point
+	double direction = randomDouble();
+	bool verticalFirst = false;
+	Point bendPoint = Point(0, 0);
+	if (direction >= 0.5) {
+		bendPoint = Point(firstMiddlePoint.getX(), secondMiddlePoint.getY());
+		verticalFirst = true;
+	}
+	else {
+		bendPoint = Point(secondMiddlePoint.getX(), firstMiddlePoint.getY());
+	}
+
+	// loop over corridor points to set tiles
+	if (verticalFirst) {
+		int firstY = firstMiddlePoint.getY();
+		int secondY = bendPoint.getY();
+		swapNumsAscending(firstY, secondY);
+		for (int y = firstY; y <= secondY; y++) {
+			dungeon->setTile(floorTile, firstMiddlePoint.getX(), y);
+		}
+
+		int firstX = bendPoint.getX();
+		int secondX = secondMiddlePoint.getX();
+		swapNumsAscending(firstX, secondX);
+		for (int x = firstX; x <= secondX; x++) {
+			dungeon->setTile(floorTile, x, secondMiddlePoint.getY());
+		}
+	}
+	else {
+		int firstX = firstMiddlePoint.getX();
+		int secondX = bendPoint.getX();
+		swapNumsAscending(firstX, secondX);
+		for (int x = firstX; x <= secondX; x++) {
+			dungeon->setTile(floorTile, x, firstMiddlePoint.getY());
+		}
+
+		int firstY = bendPoint.getY();
+		int secondY = secondMiddlePoint.getY();
+		swapNumsAscending(firstY, secondY);
+		for (int y = firstY; y <= secondY; y++) {
+			dungeon->setTile(floorTile, secondMiddlePoint.getX(), y);
+		}
+	}
+
+	// recurse with children
+	setCorridorTiles(dungeon, *node.getFirstChild());
+	setCorridorTiles(dungeon, *node.getSecondChild());
 }
 
 void BSPTree::setWallTiles(Dungeon* dungeon, Node& node) {
@@ -183,7 +239,7 @@ void BSPTree::setWallTiles(Dungeon* dungeon, Node& node) {
 	}
 }
 
-void BSPTree::setTiles(Dungeon* dungeon, Room room) {
+void BSPTree::setTiles(Dungeon* dungeon, Room& room) {
 	for (int y = room.getStartPoint().getY(); y < room.getEndPoint().getY(); y++) {
 		for (int x = room.getStartPoint().getX(); x < room.getEndPoint().getX(); x++) {
 			dungeon->setTile(floorTile, x, y);

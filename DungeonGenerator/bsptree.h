@@ -55,7 +55,7 @@ public:
 	 Set the tiles of the dungeon according to the
 	 start and end corners of the room.
 	 */
-	void setTiles(Dungeon* dungeon, Room room);
+	void setTiles(Dungeon* dungeon, Room& room);
 
 	/*
 	 Set the tiles of the dungeon according to the rooms
@@ -68,6 +68,12 @@ public:
 	 in the nodes of this tree.
 	 */
 	void setFloorTiles(Dungeon* dungeon, Node& node);
+
+	/*
+	 Set the corridor tiles of the dungeon according to the rooms
+	 in the nodes of this tree.
+	 */
+	void setCorridorTiles(Dungeon* dungeon, Node& node);
 
 	/*
 	 Set the wall tiles of the dungeon according to the rooms

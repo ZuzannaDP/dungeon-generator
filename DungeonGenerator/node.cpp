@@ -29,6 +29,30 @@ void Node::setLeaf(Room* room) {
 	}
 }
 
+//////////////// 
+
+void Room::getMiddlePoint(Point& point) {
+	int middleX = std::floor((endCorner->getX() - startCorner->getX()) / 2);
+	int middleY = std::floor((endCorner->getY() - startCorner->getY()) / 2);
+	point.setX(startCorner->getX() + middleX);
+	point.setY(startCorner->getY() + middleY);
+}
+
+Room& Node::getAnyRoom() {
+	if (getRoom()) {
+		return *getRoom();
+	}
+
+	double direction = randomDouble();
+
+	if (direction > 0.5) {
+		return child1->getAnyRoom();
+	}
+	else {
+		return child2->getAnyRoom();
+	}
+}
+
 //////////////// to string
 
 std::string Node::toString() {
