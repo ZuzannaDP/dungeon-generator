@@ -34,7 +34,7 @@ public:
 	 @param minRoomLength: The minimum length of the room.
 	 @param extra: Extra space to account for.
 	 */
-	bool hasEnoughSpaceToSplit(int lb, int ub, int minRoomLength, int extra = 0);
+	bool hasEnoughSpace(int lb, int ub, int numRooms, int minRoomLength, int extra = 0);
 
 	/*
 	 Generate space from this node.

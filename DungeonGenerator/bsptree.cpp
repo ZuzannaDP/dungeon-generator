@@ -26,11 +26,11 @@ void BSPTree::generate(Node& node) {
 
 	if (orient >= 0.5) {
 		// is there enough space to split in the randomly chosen orientation
-		if (hasEnoughSpaceToSplit(node.getStartPoint()->getX(), node.getEndPoint()->getX(), minRoomWidth)) {
+		if (hasEnoughSpace(node.getStartPoint()->getX(), node.getEndPoint()->getX(), 2, minRoomWidth)) {
 			generateSplit(false, node);
 		}
 		// is there enough space to split in the other orientation
-		else if (hasEnoughSpaceToSplit(node.getStartPoint()->getY(), node.getEndPoint()->getY(), minRoomLength, 6)) {
+		else if (hasEnoughSpace(node.getStartPoint()->getY(), node.getEndPoint()->getY(), 2, minRoomLength, 6)) {
 			generateSplit(true, node);
 		}
 		// this is a leaf node so generate a room
@@ -40,11 +40,11 @@ void BSPTree::generate(Node& node) {
 	}
 	else {
 		// is there enough space to split in the randomly chosen orientation
-		if (hasEnoughSpaceToSplit(node.getStartPoint()->getY(), node.getEndPoint()->getY(), minRoomLength)) {
+		if (hasEnoughSpace(node.getStartPoint()->getY(), node.getEndPoint()->getY(), 2, minRoomLength)) {
 			generateSplit(true, node);
 		}
 		// is there enough space to split in the other orientation
-		else if (hasEnoughSpaceToSplit(node.getStartPoint()->getX(), node.getEndPoint()->getX(), minRoomWidth, 6)) {
+		else if (hasEnoughSpace(node.getStartPoint()->getX(), node.getEndPoint()->getX(), 2, minRoomWidth, 6)) {
 			generateSplit(false, node);
 		}
 		// this is a leaf node so generate a room
@@ -79,17 +79,16 @@ void BSPTree::generateSplit(bool isVertical, Node& node) {
 	// set node children
 	node.setChildren(isVertical, child1, child2);
 
-	std::cout << "child1 addresses " << child1->getStartPoint() << ", " << child1->getEndPoint() << "\n";
-	std::cout << "child2 addresses " << child2->getStartPoint() << ", " << child2->getEndPoint() << "\n";
-	std::cout << "child1 " << child1->getStartPoint()->toString() << ", " << child1->getEndPoint()->toString() << "\n";
-	std::cout << "child2 " << child2->getStartPoint()->toString() << ", " << child2->getEndPoint()->toString() << "\n";
-
 	// recurse with children
 	generate(*node.getFirstChild());
 	generate(*node.getSecondChild());
 }
 
 void BSPTree::generateRoom(Node& node) {
+	if (!hasEnoughSpace(node.getStartPoint()->getX(), node.getEndPoint()->getX(), 1, minRoomWidth) && (node.getStartPoint()->getY(), node.getEndPoint()->getY(), 1, minRoomLength)) {
+		return;
+	}
+
 	Point* start = new Point(
 		randomInt(node.getStartPoint()->getX() + 1, node.getEndPoint()->getX() - minRoomWidth + 1),
 		randomInt(node.getStartPoint()->getY() + 1, node.getEndPoint()->getY() - minRoomLength + 1)
@@ -107,8 +106,18 @@ void BSPTree::generateRoom(Node& node) {
 
 //////////////// helper generation functions
 
-bool BSPTree::hasEnoughSpaceToSplit(int lb, int ub, int minRoomLength, int extra) {
-	return (ub - lb) >= minRoomLength * 2 + 2 + extra;
+void swapNumsAscending(int& a, int& b) {
+	if (b >= a) {
+		return;
+	}
+
+	int c = a;
+	a = b;
+	b = c;
+}
+
+bool BSPTree::hasEnoughSpace(int lb, int ub, int numRooms, int minRoomLength, int extra) {
+	return (ub - lb) >= minRoomLength * numRooms + numRooms + extra;
 }
 
 //////////////// set tiles
