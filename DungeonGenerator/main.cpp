@@ -1,14 +1,10 @@
+#include <memory>
+
 #include "main.h"
 #include "dungeon.h"
 #include "bsptree.h"
 
 using namespace std;
-
-void test(int arr[]) {
-	if (sizeof(arr) > 0) {
-		arr[0] = 3;
-	}
-}
 
 int main(int argc, char* args[]) {
 	int width, length, seed;

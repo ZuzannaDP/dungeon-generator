@@ -20,7 +20,6 @@ public:
 	}
 
 	~Room() {
-		std::cout << "deleted " << toString() << "\n";
 		delete startCorner;
 		delete endCorner;
 	}
@@ -57,7 +56,6 @@ public:
 	}
 
 	~Node() {
-		std::cout << "deleted " << toString() << "\n";
 		delete child1;
 		delete child2;
 		delete room;

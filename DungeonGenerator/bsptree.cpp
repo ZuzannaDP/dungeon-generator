@@ -1,5 +1,6 @@
 #include <sstream>
 #include <string>
+#include <memory>
 
 #include "bsptree.h"
 #include "random.h"

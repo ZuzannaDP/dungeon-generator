@@ -1,5 +1,7 @@
 #include <sstream>
 #include <string>
+#include <memory>
+#include <cmath>
 
 #include "node.h"
 #include "random.h"
