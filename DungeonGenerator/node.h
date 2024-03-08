@@ -27,6 +27,8 @@ public:
 	Point& getStartPoint();
 	Point& getEndPoint();
 
+	void getMiddlePoint(Point& point);
+
 	/*
 	 Get string representation of the room.
 	 */
@@ -54,7 +56,9 @@ public:
 	}
 
 	~Node() {
-
+		delete child1;
+		delete child2;
+		delete room;
 	}
 
 	std::shared_ptr<Point> getStartPoint();
@@ -65,6 +69,11 @@ public:
 	bool isVerticalSplit();
 	void setChildren(bool isVertical, Node* child1, Node* child2);
 	void setLeaf(Room* room);
+
+	/*
+	 Get any room in this sub tree.
+	 */
+	Room& getAnyRoom();
 
 	/*
 	 Get string representation of the node.

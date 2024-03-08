@@ -1,5 +1,7 @@
 #include <sstream>
 #include <string>
+#include <memory>
+#include <cmath>
 
 #include "node.h"
 #include "random.h"
@@ -26,6 +28,30 @@ void Node::setChildren(bool isVertical, Node* child1, Node* child2) {
 void Node::setLeaf(Room* room) {
 	if (!child1 && !child2) {
 		this->room = room;
+	}
+}
+
+//////////////// 
+
+void Room::getMiddlePoint(Point& point) {
+	int middleX = std::floor((endCorner->getX() - startCorner->getX()) / 2);
+	int middleY = std::floor((endCorner->getY() - startCorner->getY()) / 2);
+	point.setX(startCorner->getX() + middleX);
+	point.setY(startCorner->getY() + middleY);
+}
+
+Room& Node::getAnyRoom() {
+	if (getRoom()) {
+		return *getRoom();
+	}
+
+	double direction = randomDouble();
+
+	if (direction > 0.5) {
+		return child1->getAnyRoom();
+	}
+	else {
+		return child2->getAnyRoom();
 	}
 }
 
