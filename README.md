@@ -1,0 +1,2 @@
+# run
+./dungeon-gen.exe

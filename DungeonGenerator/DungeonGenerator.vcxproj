@@ -149,6 +149,7 @@
     <ClCompile Include="dungeon.cpp" />
     <ClCompile Include="dungeonGenerator.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="node.cpp" />
     <ClCompile Include="point.cpp" />
     <ClCompile Include="random.cpp" />
   </ItemGroup>
@@ -157,6 +158,7 @@
     <ClInclude Include="dungeon.h" />
     <ClInclude Include="dungeonGenerator.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="node.h" />
     <ClInclude Include="point.h" />
     <ClInclude Include="random.h" />
   </ItemGroup>

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 #include <cstdlib>
+=======
+#include <sstream>
+>>>>>>> 45acbbd983da99c5f6a5e8f07e00b447b228857f
 
 #include "random.h"
 
@@ -11,4 +15,8 @@ int randomInt(int from, int to) {
 
 	int range = to - from;
 	return from + (rand() % range);
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 45acbbd983da99c5f6a5e8f07e00b447b228857f

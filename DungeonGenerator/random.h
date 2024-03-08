@@ -14,3 +14,7 @@ double randomDouble();
 int randomInt(int from, int to);
 
 #endif
+<<<<<<< HEAD
+=======
+
+>>>>>>> 45acbbd983da99c5f6a5e8f07e00b447b228857f
